@@ -1,47 +1,75 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
-import { browser } from 'webextension-polyfill-ts';
+
+import {getMessage} from './functions/getMessage'
+import { getPrompt } from './functions/getPrompt';
+import { getActiveTab } from './functions/getActiveTab';
+
+
 
 const App: React.FC = () => {
-  const [activeTabUrl, setActiveTabUrl] = useState('');
-  const [activeTabHtml, setActiveTabHtml] = useState('');
+  // create iframe to contain the DOM
+
+  const [query, setQuery] = useState("")
+  const [message, setMessage] = useState("")
 
 
+  const getMessageFunction = async () => {
+    getActiveTab().then((response) => {
 
-  const getActiveTabUrl = async () => {
-    const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
+      console.log("getActiveTab")
+      setMessage("loading...")
+
+      const prompt = getPrompt(response.url,response.iframe)
+      console.log(prompt)
+
+      getMessage(prompt).then((message) => {
+        setMessage(message)
+      })
+      
+
+    })
+  }
+
+  useEffect(() => {
+    getMessageFunction()
+    
+  }, []);
   
-    if (tab.id) {
-      setActiveTabUrl(tab.url || 'No URL available');
-  
-      try {
-        await browser.scripting.executeScript({
-          target: { tabId: tab.id },
-          files: ['contentScript.js'],
-        });
-  
-        const response = await browser.tabs.sendMessage(tab.id, { action: 'getHtmlBody' });
-  
-        if (response && response.htmlBody) {
-          setActiveTabHtml(response.htmlBody);
-        } else {
-          setActiveTabHtml('No HTML body available');
-        }
-      } catch (error) {
-        console.error('Error injecting content script:', error);
-        setActiveTabHtml('Error injecting content script');
-      }
-    }
-  };  
   
 
+  //display app
   return (
-    <div className="App">
-      <h1>Active Tab URL</h1>
-      <button onClick={getActiveTabUrl}>Get Active Tab URL</button>
-      <p>{activeTabUrl}</p>
-      <p>{activeTabHtml}</p>
-    </div>
+    <div
+  style={{
+    width: 300,
+    height: 200,
+    backgroundColor: "#F0F0F0",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+  }}
+>
+  <h1>🥷 Message Ninja 🥷</h1>
+  <p
+    style={{
+      width: 250,
+      height: 50,
+      backgroundColor: "white",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      textAlign: "center",
+      padding: "10px",
+      borderRadius: "5px",
+    }}
+  >
+    {message}
+  </p>
+  <button onClick={getMessageFunction}>reload</button>
+</div>
+
   );
 };
 
