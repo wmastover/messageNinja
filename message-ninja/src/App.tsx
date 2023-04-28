@@ -67,7 +67,7 @@ const App: React.FC = () => {
   >
     {message}
   </p>
-  <button onClick={getMessageFunction}>reload</button>
+  <button onClick={getMessageFunction}>🔄</button>
 </div>
 
   );

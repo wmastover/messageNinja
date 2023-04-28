@@ -5,7 +5,7 @@ chrome.action.onClicked.addListener((tab) => {
 
 async function queryGPT(inputText) {
 
-  const API_KEY = "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";
+  const API_KEY = "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";
   const API_URL = "https://api.openai.com/v1/engines/text-davinci-003/completions";
   const prompt = inputText
 

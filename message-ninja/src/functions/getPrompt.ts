@@ -33,6 +33,23 @@ export const getPrompt =  (url: string, iframe: HTMLIFrameElement): string => {
 
     if (url.includes("https://twitter.com")) {
 
+
+        type profileObject = {
+          twitterProfile: {
+            twitterTag: string,
+            userDescription: string,
+            tweets: string[],
+          }
+        }
+
+        const profileObject: profileObject = {
+          twitterProfile: {
+            twitterTag: "",
+            userDescription: "",
+            tweets: [],
+          }
+        }
+
         const profileUser = url.split("/")[3]
 
 
@@ -46,9 +63,11 @@ export const getPrompt =  (url: string, iframe: HTMLIFrameElement): string => {
             const userDescription = extractTextFromChildren(targetElement)
 
             
-            queryText += `
-            \n Users Twitter Tag: ${profileUser}\n
-            \n User Description: ${userDescription}\n ` ;
+            profileObject.twitterProfile.twitterTag = profileUser
+            profileObject.twitterProfile.userDescription = userDescription
+            // queryText += `
+            // \n Users Twitter Tag: ${profileUser}\n
+            // \n User Description: ${userDescription}\n ` ;
 
             
     
@@ -106,8 +125,8 @@ export const getPrompt =  (url: string, iframe: HTMLIFrameElement): string => {
                
                 if (tweetUser === profileUser) {
                   if (tweetsAdded < 3){
-                    
-                    queryText += `\n User Tweet: ${tweetText}\n `;
+                    profileObject.twitterProfile.tweets.push(tweetText.replace(/[\r\n]+/g, ''))
+                    // queryText += `\n User Tweet: ${tweetText}\n `;
                     tweetsAdded = tweetsAdded + 1
                   }
                 }
@@ -117,12 +136,30 @@ export const getPrompt =  (url: string, iframe: HTMLIFrameElement): string => {
         } catch {
           console.log("error getting tweets")
         }
-      const prompt = "Create a casual, non-salesy, one-line personalized message for the following Twitter user based on their account name, user description, and 3 most recent tweets. Start the message with 'Hey @twittertag' and focus on one key detail: reference a specific tweet if informative or interesting, or mention their industry, job, or interests based on their user description. Avoid controversial topics like politics and asking questions. If no useful information is available, create a friendly greeting: "
-      query = prompt + `\n` + queryText
-        
+        const prompt = "Create a casual, non-salesy, one-line personalized message for the following Twitter user based on their twitter tag, user description, and an array of recent tweets. Start the message with 'Hey @twittertag’ and focus on one key detail: reference a specific tweet if informative or interesting. Alternatively: mention their industry, job, or interests based on their user description. Avoid controversial topics like politics and asking questions. If no useful information is available, create a friendly greeting. Here is a JSON object containing the profile details:"
+        query = prompt + `\n` + JSON.stringify(profileObject)
 
 
     } else if (url.includes("www.linkedin.com")) {
+
+      type profileObject = {
+        linkedInProfile: {
+          userName: string,
+          userDescription: string,
+          aboutDescripton: string,
+          experience: string[],
+        }
+      }
+      const profileObject: profileObject = {
+        linkedInProfile: {
+          userName: "",
+          userDescription: "",
+          aboutDescripton: "",
+          experience: [],
+        }
+      }
+
+      
       console.log("linkedIn")
 
       // get name and description pannel 
@@ -142,10 +179,16 @@ export const getPrompt =  (url: string, iframe: HTMLIFrameElement): string => {
         if (userDescriptionElement ) {
           userDescription = userDescriptionElement.textContent
         }
-
-        queryText+= `
-        \n Users Name: ${name}\n
-        \n User Description: ${userDescription}\n `
+        if (name) {
+          profileObject.linkedInProfile.userName = name
+        }
+        if (userDescription) {
+          profileObject.linkedInProfile.userDescription = userDescription
+        }
+        
+        // queryText+= `
+        // \n Users Name: ${name}\n
+        // \n User Description: ${userDescription}\n `
 
       } catch(err) {
         console.log("error with description")
@@ -164,10 +207,12 @@ export const getPrompt =  (url: string, iframe: HTMLIFrameElement): string => {
 
         const aboutText = aboutTextItems?.textContent
 
-
-        queryText+= `
+        if (aboutText) {
+          profileObject.linkedInProfile.aboutDescripton = aboutText
+        }
+        // queryText+= `
         
-        \n About: ${aboutText}\n `
+        // \n About: ${aboutText}\n `
         
 
         } catch(err) {
@@ -204,19 +249,20 @@ export const getPrompt =  (url: string, iframe: HTMLIFrameElement): string => {
               for (let i = 0; i < array.length; i++) {
                 experience += ` ${array[i].textContent} \n`
               }
-  
-              queryText+= `
-              
-              \n Experience: ${experience}\n `
+              if (experience) {
+                profileObject.linkedInProfile.experience.push(experience)
+              }
+              // queryText+= `
+              // \n Experience: ${experience}\n `
             }
           }
         } catch(err) {
           console.log("error with experience")
         }
       
-      const prompt = "Create a casual, non-salesy, one-line (under 15 words) personalized message for the following LinkedIn user based on their name, user description, about, and work experience. Start the message with 'Hey name!' and focus on one key detail: If they have (about: )reference this,If not reference a specific job or mention their main industry. Avoid controversial topics like politics and asking questions. If no useful information is available, create a friendly greeting: "
+      const prompt = "Create a casual, non-salesy, one-line (less than 15 words) personalized message for the following LinkedIn user based on their name, user description, about description, and an array of their experience. Start the message with 'Hey **name**!'. Focus on one key detail: If they have an interesting ‘about description’ or ‘user description’, reference this. If not, reference their experience at a specific job and mention the company name. Avoid controversial topics like politics and asking questions. If no useful information is available, create a friendly greeting. Here is a JSON object containing their linkedIn profile details :"
 
-      query = prompt + `\n` + queryText
+      query = prompt + `\n` + JSON.stringify(profileObject)
 
 
     }
