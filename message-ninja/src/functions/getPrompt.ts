@@ -265,7 +265,9 @@ export const getPrompt =  (url: string, iframe: HTMLIFrameElement): string => {
       query = prompt + `\n` + JSON.stringify(profileObject)
 
 
+    } else {
+      query = "not twitter or linkedIn"
     }
-  console.log(query)
+  
   return(query)
 }
