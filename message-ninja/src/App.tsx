@@ -6,6 +6,7 @@ import { SettingsPage } from './components/settingsPage';
 import { getMessageType } from './types';
 import { getVariableMessage } from './types';
 import { sendMessageToBackgroundScript } from './functions/sendMessageToBackgroundScript';
+import "./App.css"
 
 const App: React.FC = () => {
   // create iframe to contain the DOM
@@ -32,6 +33,7 @@ const App: React.FC = () => {
         getMessage(getMessageProps).then((message) => {
           setMessage(message)
         })
+
       } else {
         setMessage("not twitter or linkedIn")
       }
@@ -65,37 +67,19 @@ const App: React.FC = () => {
   //display app
   return (
     <div
-  style={{
-    width: 300,
-    height: 200,
-    backgroundColor: "#F0F0F0",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-  }}
+    className='app'
 >
   
   <h1>🥷 Message Ninja 🥷</h1>
-  
-
-  {settings? <p style={{
-      width: 250,
-      height: 50,
-      backgroundColor: "white",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      textAlign: "center",
-      padding: "10px",
-      borderRadius: "5px",
-    }}>{message}</p> : <SettingsPage changeSettings={changeSettings} setAPIKey={setAPIKey} getMessage={getMessageFunction}/>}
+  <div className='textBox'>
+    {settings? <p>{message}</p> : <SettingsPage changeSettings={changeSettings} setAPIKey={setAPIKey} getMessage={getMessageFunction}/>}
+  </div>
   <div style={{
     display: "flex",
     flexDirection: "row"
 
   }}>
-    <button onClick={() =>  getMessageFunction(APIKey)} style={{backgroundColor: "grey"}} >🔄</button>
+    <button onClick={() =>  getMessageFunction(APIKey)} className="button" >🔄</button>
     {/* <button onClick={() => toggleSettings(settings, changeSettings)}>⚙️</button> */}
   </div>
   
