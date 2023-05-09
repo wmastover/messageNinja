@@ -79,7 +79,7 @@ const App: React.FC = () => {
     flexDirection: "row"
 
   }}>
-    <button onClick={() =>  getMessageFunction(APIKey)} className="button" >🔄</button>
+    <button onClick={() =>  getMessageFunction(APIKey)} className="button" >♻️</button>
     {/* <button onClick={() => toggleSettings(settings, changeSettings)}>⚙️</button> */}
   </div>
   

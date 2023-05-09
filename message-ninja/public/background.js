@@ -38,6 +38,40 @@ async function queryGPT(queryGPTInput) {
   return output;
 }
   
+async function queryGPT3(queryGPTInput) {
+
+  console.log("queryGPTINput")
+  console.log(queryGPTInput)
+  const API_KEY = queryGPTInput.APIKey;
+  const API_URL = "https://api.openai.com/v1/chat/completions";
+  const prompt = queryGPTInput.content;
+
+  console.log(prompt)
+
+  const response = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + API_KEY
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: [
+          {"role": "system", "content": "You are an assistant crafting short outbound messages to be sent to potential customers."},
+          {"role": "user", "content": prompt},
+        ],
+      }),
+  });
+  
+  if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error("Failed to query GPT API. Status: " + response.status + ", Response: " + errorText);
+  }
+  
+  const jsonResponse = await response.json();
+  const output = jsonResponse.choices[0].message.content.trim();
+  return output;
+}
 // Store a variable
 function storeVariable(key, value) {
   chrome.storage.local.set({ [key]: value }, () => {
@@ -66,7 +100,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log("listener input")
     console.log(request)
 
-    queryGPT(queryGPTInput)
+    queryGPT3(queryGPTInput)
     .then((output) => {
       sendResponse({ success: true, output });
     })
