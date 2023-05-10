@@ -2,77 +2,6 @@ chrome.action.onClicked.addListener((tab) => {
     chrome.tabs.create({ url: 'index.html' });
   });
 
-
-async function queryGPT(queryGPTInput) {
-
-  console.log("queryGPTINput")
-  console.log(queryGPTInput)
-  const API_KEY = queryGPTInput.APIKey;
-  const API_URL = "https://api.openai.com/v1/engines/text-davinci-003/completions";
-  const prompt = queryGPTInput.content;
-
-  console.log(prompt)
-
-  const response = await fetch(API_URL, {
-      method: "POST",
-      headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + API_KEY
-      },
-      body: JSON.stringify({
-      prompt,
-      max_tokens: 50,
-      n: 1,
-      stop: null,
-      temperature: 0.5,
-      }),
-  });
-  
-  if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error("Failed to query GPT API. Status: " + response.status + ", Response: " + errorText);
-  }
-  
-  const jsonResponse = await response.json();
-  const output = jsonResponse.choices[0].text.trim();
-  return output;
-}
-  
-async function queryGPT3(queryGPTInput) {
-
-  console.log("queryGPTINput")
-  console.log(queryGPTInput)
-  const API_KEY = queryGPTInput.APIKey;
-  const API_URL = "https://api.openai.com/v1/chat/completions";
-  const prompt = queryGPTInput.content;
-
-  console.log(prompt)
-
-  const response = await fetch(API_URL, {
-      method: "POST",
-      headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + API_KEY
-      },
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: [
-          {"role": "system", "content": "You are an assistant crafting short outbound messages to be sent to potential customers."},
-          {"role": "user", "content": prompt},
-        ],
-      }),
-  });
-  
-  if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error("Failed to query GPT API. Status: " + response.status + ", Response: " + errorText);
-  }
-  
-  const jsonResponse = await response.json();
-  const output = jsonResponse.choices[0].message.content.trim();
-  return output;
-}
-// Store a variable
 function storeVariable(key, value) {
   chrome.storage.local.set({ [key]: value }, () => {
     console.log(`Value for '${key}' is set to '${value}'.`);
@@ -85,6 +14,106 @@ function getVariable(key, callback) {
     callback(result[key]);
   });
 }
+  
+async function reloadQueryGPT(APIKey) {
+  console.log("queryGPTINput")
+  console.log(queryGPTInput)
+  const API_KEY = APIKey;
+  const API_URL = "https://api.openai.com/v1/chat/completions";
+  
+  console.log("reloading query gpt")
+
+  const result = await new Promise((resolve) => getVariable("Messages", resolve));
+  let messages = result;
+
+  console.log("messages")
+  console.log(messages)
+  if (messages) {
+    messages.push({"role": "user", "content": "Try again, focus on a different detail if possible"});
+  } else {
+    messages = [];
+  }
+
+  console.log("reload messages")
+  console.log(messages)
+
+  const response = await fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + API_KEY
+    },
+    body: JSON.stringify({
+      model: "gpt-3.5-turbo",
+      messages: messages,
+    }),
+  });
+  console.log("response:")
+  
+  if (!response.ok) {
+    console.log("reponse not ok")
+    const errorText = await response.text();
+    throw new Error("Failed to query GPT API. Status: " + response.status + ", Response: " + errorText);
+  }
+  
+  console.log("response ok")
+  const jsonResponse = await response.json();
+  const output = jsonResponse.choices[0].message.content.trim();
+  console.log(output)
+  
+  messages.push({"role": "assistant", "content": output})
+  storeVariable("Messages", messages)
+
+
+  return output;
+}
+
+
+  
+async function queryGPT3(queryGPTInput) {
+
+  console.log("queryGPTINput")
+  console.log(queryGPTInput)
+  const API_KEY = queryGPTInput.APIKey;
+  const API_URL = "https://api.openai.com/v1/chat/completions";
+  const prompt = queryGPTInput.content;
+
+  console.log(prompt)
+
+  messages = [
+    {"role": "system", "content": "You are an assistant crafting short outbound messages to be sent to potential customers."},
+    {"role": "user", "content": prompt},
+  ]
+
+  
+
+  const response = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + API_KEY
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: messages,
+      }),
+  });
+  
+  if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error("Failed to query GPT API. Status: " + response.status + ", Response: " + errorText);
+  }
+  
+  const jsonResponse = await response.json();
+  const output = jsonResponse.choices[0].message.content.trim();
+
+  messages.push({"role": "assistant", "content": output})
+  storeVariable("Messages", messages)
+
+  return output;
+}
+
+// Store a variable
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
@@ -101,6 +130,23 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log(request)
 
     queryGPT3(queryGPTInput)
+    .then((output) => {
+      sendResponse({ success: true, output });
+    })
+    .catch((error) => {
+      sendResponse({ success: false, output: error.message });
+    });
+  // Keep the channel open for the asynchronous response
+  return true;
+
+  } else if(request.type == "reloadMessage") {
+    console.log("type = reloadMessage")
+    
+
+    console.log("listener input")
+    console.log(request)
+
+    reloadQueryGPT(request.APIKey)
     .then((output) => {
       sendResponse({ success: true, output });
     })

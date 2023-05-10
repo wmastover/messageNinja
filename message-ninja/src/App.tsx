@@ -6,30 +6,42 @@ import { SettingsPage } from './components/settingsPage';
 import { getMessageType } from './types';
 import { getVariableMessage } from './types';
 import { sendMessageToBackgroundScript } from './functions/sendMessageToBackgroundScript';
+import { getReloadMessage } from './functions/reloadMessage';
 import "./App.css"
 
 const App: React.FC = () => {
-  // create iframe to contain the DOM
-
+  
+  //message is linked to the text in the box
   const [message, setMessage] = useState("")
+
+  //changes which page is displayed ( settings currently just contains api key form)
   const [settings, changeSettings] = useState(true);
+  
+  //contains api key for queries
   const [APIKey, setAPIKey] = useState("");
 
+  //function to initiate the api call
   const getMessageFunction = async (APIKey: string) => {
     console.log("get message function api key:")
     console.log(APIKey)
 
+    //gets the dom from the current tab
     getActiveTab().then((response) => {
       setMessage("loading...")
 
+      //reads through the dom and creates a promp
       const prompt = getPrompt(response.url,response.iframe)
       
+      //checks if prompt returned not linkedIn or twitter error 
       if (prompt != "not twitter or linkedIn"){
+
+        //create the object to send to background 
         const getMessageProps: getMessageType = {
           prompt: prompt,
           APIKey: APIKey,
         }
 
+        //pass the object to the function that sends it to the background script
         getMessage(getMessageProps).then((message) => {
           setMessage(message)
         })
@@ -40,21 +52,34 @@ const App: React.FC = () => {
     })
   }
 
+
+  const getReloadMessageButton = async (APIKey: string) => {
+    setMessage("Loading...")
+    const reloadedMessage = await getReloadMessage(APIKey)
+    setMessage(reloadedMessage)
+  }
+
   useEffect(() => {
 
+    //create object to check the local storage for an api key
     const toSend: getVariableMessage = {
       type: "getVariable",
       key: "APIKey",
     }
 
+    //check the local storage for an api key
     sendMessageToBackgroundScript(toSend).then((response: any)=> {
       if (response.value) {
-        
+
+        //if found set API key value
         setAPIKey(response.value)
         console.log("api key value")
         console.log(response.value)
+        //automatically try to get message on load
         getMessageFunction(response.value)
       } else {
+
+        // if not found open settings (API key form)
         changeSettings(false)
         console.log("no api key in storage")
       }
@@ -79,7 +104,7 @@ const App: React.FC = () => {
     flexDirection: "row"
 
   }}>
-    <button onClick={() =>  getMessageFunction(APIKey)} className="button" >♻️</button>
+    <button onClick={() =>  getReloadMessageButton(APIKey)} className="button" >♻️</button>
     {/* <button onClick={() => toggleSettings(settings, changeSettings)}>⚙️</button> */}
   </div>
   

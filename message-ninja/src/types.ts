@@ -3,6 +3,13 @@ export type getMessageType = {
     APIKey: string,
   }
 
+
+  
+export type reloadMessage = {
+  type: "reloadMessage",
+  APIKey: string,
+}
+
 export type  getVariableMessage = {
     type: "getVariable",
     key: string,
@@ -20,4 +27,4 @@ export type storeVariableMessage = {
   value: string,
 }
 
-export type backgroundScriptMessage = getVariableMessage | queryGPTMessage | storeVariableMessage
+export type backgroundScriptMessage = getVariableMessage | queryGPTMessage | storeVariableMessage | reloadMessage
