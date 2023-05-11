@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Message Ninja",
-  "version": "1.0",
-  "description": "A Chrome extension to slice through sales",
+  "version": "1.1",
+  "description": "It cuts the time to personalisation in half",
   "action": {
     "default_popup": "index.html",
     "default_icon": {
@@ -11,7 +11,7 @@
       "128": "icon.png"
     }
   },
-  "permissions": ["activeTab", "scripting", "storage"],
+  "permissions": ["activeTab", "scripting", "storage", "clipboardWrite"],
   "background": {
     "service_worker": "background.js"
   },

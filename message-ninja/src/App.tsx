@@ -5,6 +5,8 @@ import { getActiveTab } from './functions/getActiveTab';
 import { SettingsPage } from './components/settingsPage';
 import { getMessageType } from './types';
 import { getVariableMessage } from './types';
+import  { copyToClipboard } from './functions/copyToClipboard'
+
 import { sendMessageToBackgroundScript } from './functions/sendMessageToBackgroundScript';
 import { getReloadMessage } from './functions/reloadMessage';
 import "./App.css"
@@ -104,8 +106,8 @@ const App: React.FC = () => {
     flexDirection: "row"
 
   }}>
-    <button onClick={() =>  getReloadMessageButton(APIKey)} className="button" >♻️</button>
-    {/* <button onClick={() => toggleSettings(settings, changeSettings)}>⚙️</button> */}
+    <button onClick={() =>  copyToClipboard(message)} className="button" >📋</button>
+    <button onClick={() =>  getReloadMessageButton(APIKey)} className="button" >♻️</button> 
   </div>
   
 </div>
