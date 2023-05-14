@@ -81,7 +81,7 @@ async function queryGPT3(queryGPTInput) {
   console.log(prompt)
 
   messages = [
-    {"role": "system", "content": "You are an assistant crafting short outbound messages to be sent to potential customers."},
+    {"role": "system", "content": "You are a recruiter, that reads through linkedIn profiles and crafts custom messages"},
     {"role": "user", "content": prompt},
   ]
 

@@ -108,7 +108,7 @@ const App: React.FC = () => {
     <div className='app'>
   
 
-  <h2 className='heading'>Message Ninja </h2>
+  <h2 className='heading unselectable'>Message Ninja </h2>
   <div className='textBox' onClick={() => {copyToClipboardButton(APIKey)}}>
     {settings? <p className='unselectable'>{message}</p> : <SettingsPage changeSettings={changeSettings} setAPIKey={setAPIKey} getMessage={getMessageFunction}/>}
   </div>
