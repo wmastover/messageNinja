@@ -6,6 +6,10 @@ import { SettingsPage } from './components/settingsPage';
 import { getMessageType } from './types';
 import { getVariableMessage } from './types';
 import  { copyToClipboard } from './functions/copyToClipboard'
+import { BsFillClipboardFill, BsFillClipboardCheckFill } from 'react-icons/bs';
+import { TfiReload } from 'react-icons/tfi'
+import { GiNinjaMask } from 'react-icons/gi'
+
 
 import { sendMessageToBackgroundScript } from './functions/sendMessageToBackgroundScript';
 import { getReloadMessage } from './functions/reloadMessage';
@@ -15,6 +19,9 @@ const App: React.FC = () => {
   
   //message is linked to the text in the box
   const [message, setMessage] = useState("")
+
+  //copied
+  const [copied, setCopied] = useState(false)
 
   //changes which page is displayed ( settings currently just contains api key form)
   const [settings, changeSettings] = useState(true);
@@ -61,6 +68,14 @@ const App: React.FC = () => {
     setMessage(reloadedMessage)
   }
 
+  const copyToClipboardButton = (APIKey: string) => {
+    copyToClipboard(message)
+    setCopied(true)
+
+  }
+
+
+
   useEffect(() => {
 
     //create object to check the local storage for an api key
@@ -93,21 +108,24 @@ const App: React.FC = () => {
 
   //display app
   return (
-    <div
-    className='app'
->
+    <div className='app'>
   
-  <h1>🥷 Message Ninja 🥷</h1>
-  <div className='textBox'>
-    {settings? <p>{message}</p> : <SettingsPage changeSettings={changeSettings} setAPIKey={setAPIKey} getMessage={getMessageFunction}/>}
+
+  <h2 className='heading'>Message Ninja </h2>
+  <div className='textBox' onClick={() => {copyToClipboardButton(APIKey)}}>
+    {settings? <p className='unselectable'>{message}</p> : <SettingsPage changeSettings={changeSettings} setAPIKey={setAPIKey} getMessage={getMessageFunction}/>}
   </div>
   <div style={{
     display: "flex",
     flexDirection: "row"
 
   }}>
-    <button onClick={() =>  copyToClipboard(message)} className="button" >📋</button>
-    <button onClick={() =>  getReloadMessageButton(APIKey)} className="button" >♻️</button> 
+    <button onClick={() =>  copyToClipboardButton(message)} className="button" >
+      {copied?  <BsFillClipboardCheckFill /> : <BsFillClipboardFill /> }
+    </button>
+    <button onClick={() =>  getReloadMessageButton(APIKey)} className="button" >
+      <TfiReload />  
+    </button> 
   </div>
   
 </div>
