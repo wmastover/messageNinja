@@ -8,9 +8,6 @@ import { getVariableMessage } from './types';
 import  { copyToClipboard } from './functions/copyToClipboard'
 import { BsFillClipboardFill, BsFillClipboardCheckFill } from 'react-icons/bs';
 import { TfiReload } from 'react-icons/tfi'
-import { GiNinjaMask } from 'react-icons/gi'
-
-
 import { sendMessageToBackgroundScript } from './functions/sendMessageToBackgroundScript';
 import { getReloadMessage } from './functions/reloadMessage';
 import "./App.css"
@@ -64,8 +61,10 @@ const App: React.FC = () => {
 
   const getReloadMessageButton = async (APIKey: string) => {
     setMessage("Loading...")
+    setCopied(false)
     const reloadedMessage = await getReloadMessage(APIKey)
     setMessage(reloadedMessage)
+    
   }
 
   const copyToClipboardButton = (APIKey: string) => {
@@ -73,8 +72,6 @@ const App: React.FC = () => {
     setCopied(true)
 
   }
-
-
 
   useEffect(() => {
 
