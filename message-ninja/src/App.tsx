@@ -6,7 +6,7 @@ import { SettingsPage } from './components/settingsPage';
 import { getMessageType } from './types';
 import { getVariableMessage } from './types';
 import  { copyToClipboard } from './functions/copyToClipboard'
-import { BsFillClipboardFill, BsFillClipboardCheckFill } from 'react-icons/bs';
+import { BsClipboard, BsFillClipboardCheckFill } from 'react-icons/bs';
 import { TfiReload } from 'react-icons/tfi'
 import { sendMessageToBackgroundScript } from './functions/sendMessageToBackgroundScript';
 import { getReloadMessage } from './functions/reloadMessage';
@@ -20,7 +20,7 @@ const App: React.FC = () => {
   //copied
   const [copied, setCopied] = useState(false)
 
-  //changes which page is displayed ( settings currently just contains api key form)
+  //changes which page is displayed ( settings currently just contains api key form) true = hidden
   const [settings, changeSettings] = useState(true);
   
   //contains api key for queries
@@ -68,8 +68,14 @@ const App: React.FC = () => {
   }
 
   const copyToClipboardButton = (APIKey: string) => {
-    copyToClipboard(message)
-    setCopied(true)
+    if (settings) {
+      copyToClipboard(message)
+      setCopied(true)
+    } else {
+      console.log("settings page")
+    }
+    
+    
 
   }
 
@@ -118,7 +124,7 @@ const App: React.FC = () => {
 
   }}>
     <button onClick={() =>  copyToClipboardButton(message)} className="button" >
-      {copied?  <BsFillClipboardCheckFill /> : <BsFillClipboardFill /> }
+      {copied?  <BsFillClipboardCheckFill /> : <BsClipboard /> }
     </button>
     <button onClick={() =>  getReloadMessageButton(APIKey)} className="button" >
       <TfiReload />  
