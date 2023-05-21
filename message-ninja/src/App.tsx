@@ -10,6 +10,8 @@ import { BsClipboard, BsFillClipboardCheckFill } from 'react-icons/bs';
 import { TfiReload } from 'react-icons/tfi'
 import { sendMessageToBackgroundScript } from './functions/sendMessageToBackgroundScript';
 import { getReloadMessage } from './functions/reloadMessage';
+import { useSelector } from 'react-redux';
+import { RootState } from './redux/store';
 import "./App.css"
 
 const App: React.FC = () => {
@@ -22,6 +24,9 @@ const App: React.FC = () => {
 
   //changes which page is displayed ( settings currently just contains api key form) true = hidden
   const [settings, changeSettings] = useState(true);
+
+  //loggedIn toggle
+  const user = useSelector((state: RootState) => state.auth.user)
   
   //contains api key for queries
   const [APIKey, setAPIKey] = useState("");
@@ -119,7 +124,6 @@ const App: React.FC = () => {
       <div style={{
         display: "flex",
         flexDirection: "row"
-
       }}>
         <button onClick={() =>  copyToClipboardButton(message)} className="button" >
           {copied?  <BsFillClipboardCheckFill /> : <BsClipboard /> }
