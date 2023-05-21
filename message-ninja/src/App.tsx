@@ -112,26 +112,23 @@ const App: React.FC = () => {
   //display app
   return (
     <div className='app'>
-  
+      <h2 className='heading unselectable'>Message Ninja </h2>
+      <div className='textBox' onClick={() => {copyToClipboardButton(APIKey)}}>
+        {settings? <p className='unselectable'>{message}</p> : <SettingsPage changeSettings={changeSettings} setAPIKey={setAPIKey} getMessage={getMessageFunction}/>}
+      </div>
+      <div style={{
+        display: "flex",
+        flexDirection: "row"
 
-  <h2 className='heading unselectable'>Message Ninja </h2>
-  <div className='textBox' onClick={() => {copyToClipboardButton(APIKey)}}>
-    {settings? <p className='unselectable'>{message}</p> : <SettingsPage changeSettings={changeSettings} setAPIKey={setAPIKey} getMessage={getMessageFunction}/>}
+      }}>
+        <button onClick={() =>  copyToClipboardButton(message)} className="button" >
+          {copied?  <BsFillClipboardCheckFill /> : <BsClipboard /> }
+        </button>
+        <button onClick={() =>  getReloadMessageButton(APIKey)} className="button" >
+          <TfiReload />  
+        </button> 
+      </div>
   </div>
-  <div style={{
-    display: "flex",
-    flexDirection: "row"
-
-  }}>
-    <button onClick={() =>  copyToClipboardButton(message)} className="button" >
-      {copied?  <BsFillClipboardCheckFill /> : <BsClipboard /> }
-    </button>
-    <button onClick={() =>  getReloadMessageButton(APIKey)} className="button" >
-      <TfiReload />  
-    </button> 
-  </div>
-  
-</div>
 
   );
 };

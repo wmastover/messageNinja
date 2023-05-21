@@ -11,7 +11,7 @@
       "128": "icon.png"
     }
   },
-  "permissions": ["activeTab", "scripting", "storage", "clipboardWrite", "clipboardRead"],
+  "permissions": ["activeTab", "scripting", "storage", "clipboardWrite"],
   "background": {
     "service_worker": "background.js"
   },

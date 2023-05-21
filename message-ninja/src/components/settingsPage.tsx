@@ -58,7 +58,7 @@ export const SettingsPage = (props: settingsPageProps) => {
             onChange={handleChange}
         />
         
-        <button type="submit" className="button">Submit</button>
+        <button type="submit" className="button2">Submit</button>
     </form>
     
     );

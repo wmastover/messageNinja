@@ -29,7 +29,7 @@ async function reloadQueryGPT(APIKey) {
   console.log("messages")
   console.log(messages)
   if (messages) {
-    messages.push({"role": "user", "content": "Try again, focus on a different detail if possible"});
+    messages.push({"role": "user", "content": "give me an alternative option"});
   } else {
     messages = [];
   }
