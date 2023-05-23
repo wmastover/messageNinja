@@ -30,8 +30,7 @@ export const getPrompt =  (url: string, iframe: HTMLIFrameElement): string => {
     let queryText = "";
     let query = ""
 
-
-    if (url.includes("https://twitter.com")) {
+if (url.includes("https://twitter.com")) {
 
 
         type profileObject = {

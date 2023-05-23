@@ -1,3 +1,43 @@
+// try {
+//   // you need to manually have firebase-compat.js file in your dir
+// self.importScripts('../firebase/firebase-compat.js');
+
+// const firebaseConfig = {
+//   apiKey: "AIzaSyB78Wj5cPff9GdU7KPB7fXvI5NfA7BKDxI",
+//   authDomain: "messageninja-5f315.firebaseapp.com",
+//   projectId: "messageninja-5f315",
+//   storageBucket: "messageninja-5f315.appspot.com",
+//   messagingSenderId: "207350695816",
+//   appId: "1:207350695816:web:49fddbb5cd70e3f2ab5c3d",
+//   measurementId: "G-8SQ6MFBG7B"
+// };
+
+// firebase.initializeApp(firebaseConfig);
+
+// var db = firebase.firestore();
+
+
+// chrome.runtime.onMessageExternal.addListener(
+//   (token, sender, sendResponse) => {
+//     firebase
+//       .auth()
+//       .signInWithCustomToken(token)
+//       .catch((error) => {
+//         console.log('error', error)
+//       })
+//     return true
+//   }
+// )
+
+// } catch (e) {
+// console.error(e);
+// }
+
+
+// this is all untested
+
+
+
 chrome.action.onClicked.addListener((tab) => {
     chrome.tabs.create({ url: 'index.html' });
   });

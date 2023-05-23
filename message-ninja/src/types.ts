@@ -27,4 +27,10 @@ export type storeVariableMessage = {
   value: string,
 }
 
-export type backgroundScriptMessage = getVariableMessage | queryGPTMessage | storeVariableMessage | reloadMessage
+export type loginMessage = {
+  type: "login",
+  token: string
+
+}
+
+export type backgroundScriptMessage = getVariableMessage | queryGPTMessage | storeVariableMessage | reloadMessage |loginMessage
