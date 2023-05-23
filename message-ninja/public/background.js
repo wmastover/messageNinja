@@ -1,37 +1,27 @@
-// try {
-//   // you need to manually have firebase-compat.js file in your dir
-// self.importScripts('../firebase/firebase-compat.js');
+try {
+  // you need to manually have firebase-compat.js file in your dir
+self.importScripts('./firebase-compat.js');
 
-// const firebaseConfig = {
-//   apiKey: "AIzaSyB78Wj5cPff9GdU7KPB7fXvI5NfA7BKDxI",
-//   authDomain: "messageninja-5f315.firebaseapp.com",
-//   projectId: "messageninja-5f315",
-//   storageBucket: "messageninja-5f315.appspot.com",
-//   messagingSenderId: "207350695816",
-//   appId: "1:207350695816:web:49fddbb5cd70e3f2ab5c3d",
-//   measurementId: "G-8SQ6MFBG7B"
-// };
-
-// firebase.initializeApp(firebaseConfig);
-
-// var db = firebase.firestore();
+const firebaseConfig = {
+  apiKey: "AIzaSyB78Wj5cPff9GdU7KPB7fXvI5NfA7BKDxI",
+  authDomain: "messageninja-5f315.firebaseapp.com",
+  projectId: "messageninja-5f315",
+  storageBucket: "messageninja-5f315.appspot.com",
+  messagingSenderId: "207350695816",
+  appId: "1:207350695816:web:49fddbb5cd70e3f2ab5c3d",
+  measurementId: "G-8SQ6MFBG7B"
+};
 
 
-// chrome.runtime.onMessageExternal.addListener(
-//   (token, sender, sendResponse) => {
-//     firebase
-//       .auth()
-//       .signInWithCustomToken(token)
-//       .catch((error) => {
-//         console.log('error', error)
-//       })
-//     return true
-//   }
-// )
+firebase.initializeApp(firebaseConfig);
 
-// } catch (e) {
-// console.error(e);
-// }
+var db = firebase.firestore();
+
+
+
+} catch (e) {
+console.error(e);
+}
 
 
 // this is all untested
@@ -215,7 +205,37 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     });
     // Keep the channel open for the asynchronous response
     return true;
-  } 
+  } else if (request.type == "login"){
+
+    console.log("login in background running")
+
+    firebase.auth().signInWithCustomToken(request.token).then((user) => {
+      // User is signed in
+      console.log(user)
+      console.log("User is signed in");
+      sendResponse({ success: true });
+    }).catch((error) => {
+      console.log(" error in login")
+      console.log('error', error)
+      sendResponse({ success: false });
+    })
+    return true;
+  } else if (request.type == "checkLogin") {
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        console.log('User is signed in:', user);
+        // User is signed in, perform some operations if you need
+        // ...
+        sendResponse({ success: true })
+      } else {
+        console.log('No user is signed in.');
+        // No user is signed in, you can redirect the user to a login page
+        // ...
+        sendResponse({ success: false })
+      }
+    });
+    return true;
+  }
 });
   
 

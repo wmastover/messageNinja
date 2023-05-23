@@ -33,4 +33,9 @@ export type loginMessage = {
 
 }
 
-export type backgroundScriptMessage = getVariableMessage | queryGPTMessage | storeVariableMessage | reloadMessage |loginMessage
+export type checkLogin = {
+  type: "checkLogin",
+
+}
+
+export type backgroundScriptMessage = getVariableMessage | queryGPTMessage | storeVariableMessage | reloadMessage |loginMessage | checkLogin
