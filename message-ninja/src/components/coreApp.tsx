@@ -49,7 +49,6 @@ export const CoreApp: React.FC = () => {
     })
   }
 
-
   const getReloadMessageButton = async () => {
     setMessage("Loading...")
     setCopied(false)
@@ -65,13 +64,9 @@ export const CoreApp: React.FC = () => {
 
   useEffect(() => {
 
-
     getMessageFunction()
 
-
-
   }, []);
-  
   
 
   //display app

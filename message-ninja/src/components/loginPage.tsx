@@ -44,7 +44,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setLoggedIn }) => {
   return (
     <div className='app' style={{color:"white"}}>
       <h2 className='heading unselectable'>Message Ninja </h2>
-      <p> 1. Head to messageNinja.ai</p>
+      <p> 1. Head to <a href="https://www.messageninja.ai" className='hyperlink'>messageninja.ai</a></p>
       <p> 2. log in to the website</p>
       <p> 3. Open the extension to log in</p>
     </div>
