@@ -1,13 +1,11 @@
 export type getMessageType = {
     prompt: string,
-    APIKey: string,
   }
 
 
   
 export type reloadMessage = {
   type: "reloadMessage",
-  APIKey: string,
 }
 
 export type  getVariableMessage = {
@@ -18,7 +16,6 @@ export type  getVariableMessage = {
 export type queryGPTMessage= {
     type: "queryGPT",
     content: string
-    APIKey: string
   }
 
 export type storeVariableMessage = {

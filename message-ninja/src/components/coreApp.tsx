@@ -2,16 +2,11 @@ import React, { useState, useEffect } from 'react';
 import {getMessage} from '../functions/getMessage'
 import { getPrompt } from '../functions/getPrompt';
 import { getActiveTab } from '../functions/getActiveTab';
-import { SettingsPage } from './settingsPage';
 import { getMessageType } from '../types';
-import { getVariableMessage } from '../types';
 import  { copyToClipboard } from '../functions/copyToClipboard'
 import { BsClipboard, BsFillClipboardCheckFill } from 'react-icons/bs';
 import { TfiReload } from 'react-icons/tfi'
-import { sendMessageToBackgroundScript } from '../functions/sendMessageToBackgroundScript';
 import { getReloadMessage } from '../functions/reloadMessage';
-import { useSelector } from 'react-redux';
-import { RootState } from '../redux/store';
 import "../App.css"
 
 export const CoreApp: React.FC = () => {
@@ -22,19 +17,11 @@ export const CoreApp: React.FC = () => {
   //copied
   const [copied, setCopied] = useState(false)
 
-  //changes which page is displayed ( settings currently just contains api key form) true = hidden
-  const [settings, changeSettings] = useState(true);
-
-  //loggedIn toggle
-  const [loggedIn, setLoggedIn] = useState(false)
-  
-  //contains api key for queries
-  const [APIKey, setAPIKey] = useState("");
+  //changes which page is displayed ( settings currently just contains api key form) true = hidden  
 
   //function to initiate the api call
-  const getMessageFunction = async (APIKey: string) => {
-    console.log("get message function api key:")
-    console.log(APIKey)
+  const getMessageFunction = async () => {
+    console.log("get message function")
 
     //gets the dom from the current tab
     getActiveTab().then((response) => {
@@ -49,7 +36,6 @@ export const CoreApp: React.FC = () => {
         //create the object to send to background 
         const getMessageProps: getMessageType = {
           prompt: prompt,
-          APIKey: APIKey,
         }
 
         //pass the object to the function that sends it to the background script
@@ -64,49 +50,26 @@ export const CoreApp: React.FC = () => {
   }
 
 
-  const getReloadMessageButton = async (APIKey: string) => {
+  const getReloadMessageButton = async () => {
     setMessage("Loading...")
     setCopied(false)
-    const reloadedMessage = await getReloadMessage(APIKey)
+    const reloadedMessage = await getReloadMessage()
     setMessage(reloadedMessage)
     
   }
 
-  const copyToClipboardButton = (APIKey: string) => {
-    if (settings) {
+  const copyToClipboardButton = (message:string) => {
       copyToClipboard(message)
       setCopied(true)
-    } else {
-      console.log("settings page")
-    }
   }
 
   useEffect(() => {
 
-    //create object to check the local storage for an api key
-    const toSend: getVariableMessage = {
-      type: "getVariable",
-      key: "APIKey",
-    }
 
-    //check the local storage for an api key
-    sendMessageToBackgroundScript(toSend).then((response: any)=> {
-      if (response.value) {
+    getMessageFunction()
 
-        //if found set API key value
-        setAPIKey(response.value)
-        console.log("api key value")
-        console.log(response.value)
-        //automatically try to get message on load
-        getMessageFunction(response.value)
-      } else {
 
-        // if not found open settings (API key form)
-        changeSettings(false)
-        console.log("no api key in storage")
-      }
-      
-    })
+
   }, []);
   
   
@@ -115,14 +78,14 @@ export const CoreApp: React.FC = () => {
   return (
     <div className='app'>
       <h2 className='heading unselectable'>Message Ninja </h2>
-      <div className='textBox' onClick={() => {copyToClipboardButton(APIKey)}}>
-        {settings? <p className='unselectable'>{message}</p> : <SettingsPage changeSettings={changeSettings} setAPIKey={setAPIKey} getMessage={getMessageFunction}/>}
+      <div className='textBox' onClick={() => {copyToClipboardButton(message)}}>
+        <p className='unselectable'>{message}</p>
       </div>
       <div style={{display: "flex",flexDirection: "row"}}>
         <button onClick={() =>  copyToClipboardButton(message)} className="button" >
           {copied?  <BsFillClipboardCheckFill /> : <BsClipboard /> }
         </button>
-        <button onClick={() =>  getReloadMessageButton(APIKey)} className="button" >
+        <button onClick={() =>  getReloadMessageButton()} className="button" >
           <TfiReload />  
         </button> 
       </div>

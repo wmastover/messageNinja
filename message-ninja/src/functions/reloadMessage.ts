@@ -1,7 +1,7 @@
-import { getMessageType, reloadMessage } from "../types"
+import { reloadMessage } from "../types"
 import { sendMessageToBackgroundScript } from "./sendMessageToBackgroundScript"
 
-export const getReloadMessage = async (APIKey: string) => {
+export const getReloadMessage = async () => {
     
     let message = ""
 
@@ -9,7 +9,7 @@ export const getReloadMessage = async (APIKey: string) => {
 
       const toSend: reloadMessage = {
         type: "reloadMessage",
-        APIKey: APIKey,
+
       }
 
       console.log("reloadMessage.ts => background.js")

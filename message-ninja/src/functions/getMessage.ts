@@ -14,7 +14,6 @@ export const getMessage = async (props: getMessageType) => {
       const toSend: queryGPTMessage = {
         type: "queryGPT",
         content: props.prompt,
-        APIKey: props.APIKey,
       }
       const response: any = await sendMessageToBackgroundScript(toSend);
       

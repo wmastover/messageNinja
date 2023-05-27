@@ -12,20 +12,13 @@ const firebaseConfig = {
   measurementId: "G-8SQ6MFBG7B"
 };
 
-
 firebase.initializeApp(firebaseConfig);
 
 var db = firebase.firestore();
 
-
-
 } catch (e) {
 console.error(e);
 }
-
-
-// this is all untested
-
 
 
 chrome.action.onClicked.addListener((tab) => {
@@ -45,103 +38,70 @@ function getVariable(key, callback) {
   });
 }
   
-async function reloadQueryGPT(APIKey) {
-  console.log("queryGPTINput")
-  console.log(queryGPTInput)
-  const API_KEY = APIKey;
-  const API_URL = "https://api.openai.com/v1/chat/completions";
-  
-  console.log("reloading query gpt")
+const firebaseFunctions = firebase.functions();
+
+
+
+//talks to firebase function 
+async function queryGPT3(queryGPTInput) {
+  console.log("queryGPTINput");
+  console.log(queryGPTInput);
+  const prompt = queryGPTInput.content;
+
+  console.log(prompt);
+
+  let messages = [
+    {"role": "system", "content": "You are a recruiter, that reads through linkedIn profiles and crafts custom messages"},
+    {"role": "user", "content": prompt},
+  ]
+
+  try {
+    const queryGPT3 = firebaseFunctions.httpsCallable('queryGPT3');
+    const output = await queryGPT3({ messages });
+    
+    
+    messages.push({"role": "assistant", "content": output.data});
+    storeVariable("Messages", messages);
+    return output.data;
+  } catch (error) {
+    throw new Error("Failed to query GPT API. Message: " + error.message);
+  }
+}
+
+
+//talks to firebase function 
+async function reloadQueryGPT() {
+  console.log("queryGPTINput");
+  console.log(queryGPTInput);
 
   const result = await new Promise((resolve) => getVariable("Messages", resolve));
   let messages = result;
 
-  console.log("messages")
-  console.log(messages)
+  console.log("messages");
+  console.log(messages);
   if (messages) {
     messages.push({"role": "user", "content": "give me an alternative option"});
   } else {
     messages = [];
   }
 
-  console.log("reload messages")
-  console.log(messages)
+  console.log("reload messages");
+  console.log(messages);
 
-  const response = await fetch(API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + API_KEY
-    },
-    body: JSON.stringify({
-      model: "gpt-3.5-turbo",
-      messages: messages,
-    }),
-  });
-  console.log("response:")
-  
-  if (!response.ok) {
-    console.log("reponse not ok")
-    const errorText = await response.text();
-    throw new Error("Failed to query GPT API. Status: " + response.status + ", Response: " + errorText);
+  try {
+    const queryGPT3 = firebaseFunctions.httpsCallable('queryGPT3');
+    const output = await queryGPT3({ messages });
+    
+
+
+    messages.push({"role": "assistant", "content": output.data});
+    storeVariable("Messages", messages);
+    return output.data;
+  } catch (error) {
+    throw new Error("Failed to query GPT API. Message: " + error.message);
   }
-  
-  console.log("response ok")
-  const jsonResponse = await response.json();
-  const output = jsonResponse.choices[0].message.content.trim();
-  console.log(output)
-  
-  messages.push({"role": "assistant", "content": output})
-  storeVariable("Messages", messages)
-
-
-  return output;
 }
 
-
-  
-async function queryGPT3(queryGPTInput) {
-
-  console.log("queryGPTINput")
-  console.log(queryGPTInput)
-  const API_KEY = queryGPTInput.APIKey;
-  const API_URL = "https://api.openai.com/v1/chat/completions";
-  const prompt = queryGPTInput.content;
-
-  console.log(prompt)
-
-  messages = [
-    {"role": "system", "content": "You are a recruiter, that reads through linkedIn profiles and crafts custom messages"},
-    {"role": "user", "content": prompt},
-  ]
-
-  
-
-  const response = await fetch(API_URL, {
-      method: "POST",
-      headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + API_KEY
-      },
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: messages,
-      }),
-  });
-  
-  if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error("Failed to query GPT API. Status: " + response.status + ", Response: " + errorText);
-  }
-  
-  const jsonResponse = await response.json();
-  const output = jsonResponse.choices[0].message.content.trim();
-
-  messages.push({"role": "assistant", "content": output})
-  storeVariable("Messages", messages)
-
-  return output;
-}
 
 // Store a variable
 
@@ -153,7 +113,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     
     queryGPTInput = {
       content: request.content,
-      APIKey: request.APIKey,
     }
 
     console.log("listener input")
@@ -176,7 +135,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log("listener input")
     console.log(request)
 
-    reloadQueryGPT(request.APIKey)
+    reloadQueryGPT()
     .then((output) => {
       sendResponse({ success: true, output });
     })
