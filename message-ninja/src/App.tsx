@@ -19,13 +19,13 @@ const App: React.FC = () => {
     sendMessageToBackgroundScript(toSend).then((response: any) => {
       if (response.success) {
       
-        console.log("success")
-        console.log(response.output)
+        console.log("logged In")
+        console.log(response)
         
 
       } else {
-        console.log("failure")
-        console.log(response.output)
+        console.log("not logged in")
+        console.log(response)
         setLoggedIn(false)
       }
   })

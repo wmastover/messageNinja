@@ -1,3 +1,4 @@
+import { linkedInProfileObject, twitterProfileObject, getPromptType} from '../types'
 
 
 // used to get text from a block when it contains multiple elements
@@ -24,132 +25,125 @@ function extractTextFromChildren(element: any): string {
 
 
 // used to get the prompt to send to openAI from a url and the content
-export const getPrompt =  (url: string, iframe: HTMLIFrameElement): string => {
+export const getPrompt =  (url: string, iframe: HTMLIFrameElement): getPromptType => {
 
 
-    let queryText = "";
-    let query = ""
+  let queryText = "";
+  let query = ""
+  let returnValue: getPromptType = {
+    prompt: null,
+    profile: null,
+  }
 
-if (url.includes("https://twitter.com")) {
-
-
-        type profileObject = {
-          twitterProfile: {
-            twitterTag: string,
-            userDescription: string,
-            tweets: string[],
-          }
-        }
-
-        const profileObject: profileObject = {
-          twitterProfile: {
-            twitterTag: "",
-            userDescription: "",
-            tweets: [],
-          }
-        }
-
-        const profileUser = url.split("/")[3]
+//disable twitter for v1
+// if (url.includes("https://twitter.com/")) {
 
 
-        const userDescriptionXpath = ".//div[@data-testid='UserDescription']";
-        const userDescriptionResult = iframe.contentDocument?.evaluate(userDescriptionXpath, iframe.contentDocument, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-        const targetElement = userDescriptionResult?.singleNodeValue;
+
+//         const profileObject: twitterProfileObject = {
+//           twitterProfile: {
+//             twitterTag: "",
+//             userDescription: "",
+//             tweets: [],
+//           }
+//         }
+
+//         const profileUser = url.split("/")[3]
+
+
+//         const userDescriptionXpath = ".//div[@data-testid='UserDescription']";
+//         const userDescriptionResult = iframe.contentDocument?.evaluate(userDescriptionXpath, iframe.contentDocument, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+//         const targetElement = userDescriptionResult?.singleNodeValue;
   
-        try {
-          if (targetElement) {
+//         try {
+//           if (targetElement) {
 
-            const userDescription = extractTextFromChildren(targetElement)
+//             const userDescription = extractTextFromChildren(targetElement)
 
             
-            profileObject.twitterProfile.twitterTag = profileUser
-            profileObject.twitterProfile.userDescription = userDescription
-            // queryText += `
-            // \n Users Twitter Tag: ${profileUser}\n
-            // \n User Description: ${userDescription}\n ` ;
+//             profileObject.twitterProfile.twitterTag = profileUser
+//             profileObject.twitterProfile.userDescription = userDescription
+//             // queryText += `
+//             // \n Users Twitter Tag: ${profileUser}\n
+//             // \n User Description: ${userDescription}\n ` ;
 
             
     
-          } else {
+//           } else {
     
-            console.log("user description not found")
+//             console.log("user description not found")
     
-          } 
-        } catch {
-          console.log("error getting name and user description")
-        }
+//           } 
+//         } catch {
+//           console.log("error getting name and user description")
+//         }
 
-        //get tweets
-        try{
-          const xpathTweetsList = '//div[@data-testid="cellInnerDiv"]';
-          const resultTweetsList = iframe.contentDocument?.evaluate(xpathTweetsList, iframe.contentDocument, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+//         //get tweets
+//         try{
+//           const xpathTweetsList = '//div[@data-testid="cellInnerDiv"]';
+//           const resultTweetsList = iframe.contentDocument?.evaluate(xpathTweetsList, iframe.contentDocument, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
     
-          // create counter so query can only send 3 tweets 
-          let tweetsAdded = 0
+//           // create counter so query can only send 3 tweets 
+//           let tweetsAdded = 0
   
-          //check if cointainer exists
-          if(resultTweetsList){
-            //initiate loop if some tweets exist
-            if (resultTweetsList.snapshotLength > 0) {
-              for (let i = 0; i < resultTweetsList.snapshotLength; i++) {
+//           //check if cointainer exists
+//           if(resultTweetsList){
+//             //initiate loop if some tweets exist
+//             if (resultTweetsList.snapshotLength > 0) {
+//               for (let i = 0; i < resultTweetsList.snapshotLength; i++) {
   
-                const tweet = resultTweetsList.snapshotItem(i);
+//                 const tweet = resultTweetsList.snapshotItem(i);
   
-                let tweetUser: string | null = "";
-                let tweetText: string | null = "";
+//                 let tweetUser: string | null = "";
+//                 let tweetText: string | null = "";
     
-                try {
-                  if (tweet){
-                    //convert tweet to element so I can use query selector
-                    const element = tweet as HTMLElement
+//                 try {
+//                   if (tweet){
+//                     //convert tweet to element so I can use query selector
+//                     const element = tweet as HTMLElement
   
-                    const tweetUserElement = element.querySelector('div[data-testid="User-Name"] a');
-                    const tweetTextElement = element.querySelector('div[data-testid="tweetText"]');
+//                     const tweetUserElement = element.querySelector('div[data-testid="User-Name"] a');
+//                     const tweetTextElement = element.querySelector('div[data-testid="tweetText"]');
         
-                    if (tweetUserElement) {
-                      tweetUser = tweetUserElement.getAttribute("href");
+//                     if (tweetUserElement) {
+//                       tweetUser = tweetUserElement.getAttribute("href");
                       
-                    }
-                    if (tweetTextElement) {
-                      tweetText = extractTextFromChildren(tweetTextElement);
-                    }
-                  }
-                } catch (error) {
-                  console.error("Error while extracting tweet information:", error);
-                }
+//                     }
+//                     if (tweetTextElement) {
+//                       tweetText = extractTextFromChildren(tweetTextElement);
+//                     }
+//                   }
+//                 } catch (error) {
+//                   console.error("Error while extracting tweet information:", error);
+//                 }
                   
-                if (tweetUser) {
-                  tweetUser = tweetUser.replace("/", "")
-                }
+//                 if (tweetUser) {
+//                   tweetUser = tweetUser.replace("/", "")
+//                 }
                
-                if (tweetUser === profileUser) {
-                  if (tweetsAdded < 3){
-                    profileObject.twitterProfile.tweets.push(tweetText.replace(/[\r\n]+/g, ''))
-                    // queryText += `\n User Tweet: ${tweetText}\n `;
-                    tweetsAdded = tweetsAdded + 1
-                  }
-                }
-              }
-            }
-          }
-        } catch {
-          console.log("error getting tweets")
-        }
-        const prompt = "Create a casual, non-salesy, one-line personalized message for the following Twitter user based on their twitter tag, user description, and an array of recent tweets. Start the message with 'Hey @twittertag’ and focus on one key detail: reference a specific tweet if informative or interesting. Alternatively: mention their industry, job, or interests based on their user description. Avoid controversial topics like politics and asking questions. If no useful information is available, create a friendly greeting. Here is a JSON object containing the profile details:"
-        query = prompt + `\n` + JSON.stringify(profileObject)
+//                 if (tweetUser === profileUser) {
+//                   if (tweetsAdded < 3){
+//                     profileObject.twitterProfile.tweets.push(tweetText.replace(/[\r\n]+/g, ''))
+//                     // queryText += `\n User Tweet: ${tweetText}\n `;
+//                     tweetsAdded = tweetsAdded + 1
+//                   }
+//                 }
+//               }
+//             }
+//           }
+//         } catch {
+//           console.log("error getting tweets")
+//         }
+//         const prompt = "Create a casual, non-salesy, one-line personalized message for the following Twitter user based on their twitter tag, user description, and an array of recent tweets. Start the message with 'Hey @twittertag’ and focus on one key detail: reference a specific tweet if informative or interesting. Alternatively: mention their industry, job, or interests based on their user description. Avoid controversial topics like politics and asking questions. If no useful information is available, create a friendly greeting. Here is a JSON object containing the profile details:"
+//         query = prompt + `\n` + JSON.stringify(profileObject)
 
 
-    } else if (url.includes("www.linkedin.com")) {
+    // } else 
+    
+    if (url.includes("www.linkedin.com")) {
 
-      type profileObject = {
-        linkedInProfile: {
-          userName: string,
-          userDescription: string,
-          aboutDescripton: string,
-          experience: string[],
-        }
-      }
-      const profileObject: profileObject = {
+
+      const profileObject: linkedInProfileObject = {
         linkedInProfile: {
           userName: "",
           userDescription: "",
@@ -267,11 +261,22 @@ Above all the reply should make sense, read well and be as succinct as possible.
 Here is the JSON object containing the LinkedIn profile details:`
 
       query = prompt + `\n` + JSON.stringify(profileObject)
+      
+      returnValue = {
+        prompt: query,
+        profile: profileObject
 
+      }
 
     } else {
-      query = "not twitter or linkedIn"
+      query = "not linkedIn"
+      
+      returnValue = {
+        prompt: query,
+        profile: null
+
+      }
     }
   
-  return(query)
+  return(returnValue)
 }

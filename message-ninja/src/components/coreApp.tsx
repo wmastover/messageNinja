@@ -2,20 +2,23 @@ import React, { useState, useEffect } from 'react';
 import {getMessage} from '../functions/getMessage'
 import { getPrompt } from '../functions/getPrompt';
 import { getActiveTab } from '../functions/getActiveTab';
-import { getMessageType } from '../types';
+import { getMessageType, profile, eventMessage} from '../types';
 import  { copyToClipboard } from '../functions/copyToClipboard'
 import { BsClipboard, BsFillClipboardCheckFill } from 'react-icons/bs';
 import { TfiReload } from 'react-icons/tfi'
 import { getReloadMessage } from '../functions/reloadMessage';
 import "../App.css"
 
+import { sendMessageToBackgroundScript } from '../functions/sendMessageToBackgroundScript';
+
 export const CoreApp: React.FC = () => {
   
   //message is linked to the text in the box
   const [message, setMessage] = useState("")
-
   //copied
   const [copied, setCopied] = useState(false)
+
+  const [profile, setProfile] = useState<profile>(null)
 
   //changes which page is displayed ( settings currently just contains api key form) true = hidden  
 
@@ -27,15 +30,15 @@ export const CoreApp: React.FC = () => {
     getActiveTab().then((response) => {
       setMessage("loading...")
 
-      //reads through the dom and creates a promp
-      const prompt = getPrompt(response.url,response.iframe)
+      //reads through the dom and creates a prompt
+      const returnValue = getPrompt(response.url,response.iframe)
       
       //checks if prompt returned not linkedIn or twitter error 
-      if (prompt != "not twitter or linkedIn"){
-
+      if (returnValue.prompt != "not linkedIn" && returnValue.prompt){
+        
         //create the object to send to background 
         const getMessageProps: getMessageType = {
-          prompt: prompt,
+          prompt: returnValue.prompt,
         }
 
         //pass the object to the function that sends it to the background script
@@ -43,8 +46,10 @@ export const CoreApp: React.FC = () => {
           setMessage(message)
         })
 
+        setProfile(returnValue.profile)
+        
       } else {
-        setMessage("not twitter or linkedIn")
+        setMessage("not linkedIn")
       }
     })
   }
@@ -53,13 +58,35 @@ export const CoreApp: React.FC = () => {
     setMessage("Loading...")
     setCopied(false)
     const reloadedMessage = await getReloadMessage()
+    const originalMessage = message
+
     setMessage(reloadedMessage)
-    
+
+    const eventMessage: eventMessage = {
+      type: "event",
+      profile: profile,
+      message: originalMessage,
+      eventType: "reload"
+    }
+
+
+    sendMessageToBackgroundScript(eventMessage)
+
   }
 
   const copyToClipboardButton = (message:string) => {
       copyToClipboard(message)
       setCopied(true)
+
+      const eventMessage: eventMessage = {
+        type: "event",
+        profile: profile,
+        message: message,
+        eventType: "copy"
+      }
+  
+      sendMessageToBackgroundScript(eventMessage)
+  
   }
 
   useEffect(() => {

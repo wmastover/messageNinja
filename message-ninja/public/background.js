@@ -181,6 +181,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
   } else if (request.type == "checkLogin") {
     firebase.auth().onAuthStateChanged((user) => {
+      
       if (user) {
         console.log('User is signed in:', user);
         // User is signed in, perform some operations if you need
@@ -194,7 +195,34 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       }
     });
     return true;
+  // ...
+
+} else if (request.type == "event") {
+  // add document to firestore, in the users collection, document named after the user Id, in the events collection. 
+  let eventDocument = {
+    profile: request.profile,
+    message: request.message,
+    eventType: request.eventType,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp() // Add timestamp if you want to keep track of when the event was logged
+  };
+
+  let user = firebase.auth().currentUser;
+  if (user) { // Check if user is authenticated before trying to add data to Firestore
+    db.collection('users').doc(user.uid).collection('events').add(eventDocument)
+      .then((docRef) => {
+        console.log("Document written with ID: ", docRef.id);
+      })
+      .catch((error) => {
+        console.error("Error adding document: ", error);
+      });
+  } else {
+    console.log("User not authenticated. Please authenticate before logging events.");
   }
+  
+  return true;
+}
+
+
 });
   
 

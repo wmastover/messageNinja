@@ -9,10 +9,12 @@ interface LoginPageProps {
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({ setLoggedIn }) => {
-  const getMessageFunction = async () => {
+  const getTokenFunction = async () => {
     getActiveTab().then((response) => {
       const token = getToken(response.url, response.iframe);
       if (token != "no token") {
+
+        console.log("token found")
         try {
           const toSend: loginMessage = {
             type: "login",
@@ -32,13 +34,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setLoggedIn }) => {
           console.log("response --");
           console.log(error.message);
         }  
-      }
+      } 
     });
   }
 
   useEffect(() => {
-    console.log("useEffect");
-    getMessageFunction();
+    console.log("useEffect in login page");
+    getTokenFunction();
   }, []);
 
   return (

@@ -1,11 +1,47 @@
+
+
+export type twitterProfileObject = {
+  twitterProfile: {
+    twitterTag: string,
+    userDescription: string,
+    tweets: string[],
+  }
+}
+
+
+
+export type linkedInProfileObject = {
+  linkedInProfile: {
+    userName: string,
+    userDescription: string,
+    aboutDescripton: string,
+    experience: string[],
+  }
+}
+
+export type profile = linkedInProfileObject | twitterProfileObject | null
+
+
+export type getPromptType = {
+  prompt: string | null
+  profile: profile
+}
+
+
 export type getMessageType = {
     prompt: string,
   }
 
-
   
 export type reloadMessage = {
   type: "reloadMessage",
+}
+
+export type eventMessage = {
+    type: "event",
+    profile: profile,
+    message: string,
+    eventType: "copy" | "reload"
 }
 
 export type  getVariableMessage = {
@@ -35,4 +71,4 @@ export type checkLogin = {
 
 }
 
-export type backgroundScriptMessage = getVariableMessage | queryGPTMessage | storeVariableMessage | reloadMessage |loginMessage | checkLogin
+export type backgroundScriptMessage = getVariableMessage | queryGPTMessage | storeVariableMessage | reloadMessage |loginMessage | checkLogin | eventMessage
