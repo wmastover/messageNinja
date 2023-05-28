@@ -140,7 +140,7 @@ export const getPrompt =  (url: string, iframe: HTMLIFrameElement): getPromptTyp
 
     // } else 
     
-    if (url.includes("www.linkedin.com")) {
+    if (url.includes("www.linkedin.com/in")) {
 
 
       const profileObject: linkedInProfileObject = {

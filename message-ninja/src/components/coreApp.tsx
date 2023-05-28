@@ -8,6 +8,8 @@ import { BsClipboard, BsFillClipboardCheckFill } from 'react-icons/bs';
 import { TfiReload } from 'react-icons/tfi'
 import { getReloadMessage } from '../functions/reloadMessage';
 import "../App.css"
+import '../assets/DINCondensed-Regular.ttf'
+import '../assets/DINCondensed-Regular.woff'
 
 import { sendMessageToBackgroundScript } from '../functions/sendMessageToBackgroundScript';
 
@@ -49,7 +51,7 @@ export const CoreApp: React.FC = () => {
         setProfile(returnValue.profile)
         
       } else {
-        setMessage("not linkedIn")
+        setMessage("Navigate to a linkedIn user profile to generate a personalised message")
       }
     })
   }
@@ -99,15 +101,17 @@ export const CoreApp: React.FC = () => {
   //display app
   return (
     <div className='app'>
-      <h2 className='heading unselectable'>Message Ninja </h2>
-      <div className='textBox' onClick={() => {copyToClipboardButton(message)}}>
-        <p className='unselectable'>{message}</p>
+      {/* <h2 className='heading unselectable' style={{ fontFamily: 'DINCondensed-Regular' }}>Message Ninja </h2> */}
+      <div className="textBoxContainer">
+        <div className='textBox' onClick={() => {copyToClipboardButton(message)}}>
+          <p className='unselectable'>{message}</p>
+        </div>
       </div>
-      <div style={{display: "flex",flexDirection: "row"}}>
-        <button onClick={() =>  copyToClipboardButton(message)} className="button" >
+      <div className='buttonContainer'>
+        <button onClick={() =>  copyToClipboardButton(message)} className="button copy" >
           {copied?  <BsFillClipboardCheckFill /> : <BsClipboard /> }
         </button>
-        <button onClick={() =>  getReloadMessageButton()} className="button" >
+        <button onClick={() =>  getReloadMessageButton()} className="button reload" >
           <TfiReload />  
         </button> 
       </div>
