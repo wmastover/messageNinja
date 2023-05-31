@@ -4,9 +4,6 @@ import { sendMessageToBackgroundScript } from "./sendMessageToBackgroundScript"
 
 export const getMessage = async (props: getMessageType) => {
 
-    console.log("get message props:")
-    console.log(props)
-
     let message = ""
 
     try {

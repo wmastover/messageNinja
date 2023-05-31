@@ -71,14 +71,13 @@ async function queryGPT3(queryGPTInput) {
 
 //talks to firebase function 
 async function reloadQueryGPT() {
-  console.log("queryGPTINput");
-  console.log(queryGPTInput);
 
   const result = await new Promise((resolve) => getVariable("Messages", resolve));
   let messages = result;
 
   console.log("messages");
   console.log(messages);
+
   if (messages) {
     messages.push({"role": "user", "content": "give me an alternative option"});
   } else {
@@ -92,7 +91,6 @@ async function reloadQueryGPT() {
     const queryGPT3 = firebaseFunctions.httpsCallable('queryGPT3');
     const output = await queryGPT3({ messages });
     
-
 
     messages.push({"role": "assistant", "content": output.data});
     storeVariable("Messages", messages);

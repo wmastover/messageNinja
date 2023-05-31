@@ -152,9 +152,6 @@ export const getPrompt =  (url: string, iframe: HTMLIFrameElement): getPromptTyp
         }
       }
 
-      
-      console.log("linkedIn")
-
       // get name and description pannel 
       try {
         const leftPanel = iframe.contentDocument?.getElementsByClassName("pv-text-details__left-panel")[0]
@@ -219,9 +216,7 @@ export const getPrompt =  (url: string, iframe: HTMLIFrameElement): getPromptTyp
 
           const experiencePanelItemsContainer = experiencePanel?.parentElement
 
-
           const experiencePanelItems = experiencePanelItemsContainer?.getElementsByClassName("artdeco-list__item")
-          
 
           let itterations = 0
           if (experiencePanelItems) {
@@ -265,7 +260,6 @@ Here is the JSON object containing the LinkedIn profile details:`
       returnValue = {
         prompt: query,
         profile: profileObject
-
       }
 
     } else {
@@ -274,8 +268,8 @@ Here is the JSON object containing the LinkedIn profile details:`
       returnValue = {
         prompt: query,
         profile: null
-
       }
+      
     }
   
   return(returnValue)

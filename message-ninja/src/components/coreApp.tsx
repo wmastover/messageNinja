@@ -10,6 +10,7 @@ import { getReloadMessage } from '../functions/reloadMessage';
 import "../App.css"
 import '../assets/DINCondensed-Regular.ttf'
 import '../assets/DINCondensed-Regular.woff'
+import {LoadingBar} from './loadingBar'
 
 import { sendMessageToBackgroundScript } from '../functions/sendMessageToBackgroundScript';
 
@@ -21,8 +22,23 @@ export const CoreApp: React.FC = () => {
   const [copied, setCopied] = useState(false)
 
   const [profile, setProfile] = useState<profile>(null)
-
+  const [loadingBarVisible, setLoadingBarVisible] = useState<boolean>(false)
+  const [ apiResponded, setAPIResponded] = useState<boolean>(false)
   //changes which page is displayed ( settings currently just contains api key form) true = hidden  
+
+  const openLoadingBar = () => {
+    setAPIResponded(false)
+    setLoadingBarVisible(true)
+  }
+
+  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+  const closeLoadingBar = async () => {
+    setAPIResponded(true)
+
+    await delay(100);
+    setLoadingBarVisible(false)
+  }
 
   //function to initiate the api call
   const getMessageFunction = async () => {
@@ -30,14 +46,14 @@ export const CoreApp: React.FC = () => {
 
     //gets the dom from the current tab
     getActiveTab().then((response) => {
-      setMessage("loading...")
+      
 
       //reads through the dom and creates a prompt
       const returnValue = getPrompt(response.url,response.iframe)
       
       //checks if prompt returned not linkedIn or twitter error 
       if (returnValue.prompt != "not linkedIn" && returnValue.prompt){
-        
+        openLoadingBar()
         //create the object to send to background 
         const getMessageProps: getMessageType = {
           prompt: returnValue.prompt,
@@ -46,8 +62,10 @@ export const CoreApp: React.FC = () => {
         //pass the object to the function that sends it to the background script
         getMessage(getMessageProps).then((message) => {
           setMessage(message)
+          closeLoadingBar()
         })
 
+        // store the recent linkedIn profile in state
         setProfile(returnValue.profile)
         
       } else {
@@ -57,12 +75,13 @@ export const CoreApp: React.FC = () => {
   }
 
   const getReloadMessageButton = async () => {
-    setMessage("Loading...")
+    openLoadingBar()
     setCopied(false)
     const reloadedMessage = await getReloadMessage()
     const originalMessage = message
 
     setMessage(reloadedMessage)
+    closeLoadingBar()
 
     const eventMessage: eventMessage = {
       type: "event",
@@ -71,9 +90,7 @@ export const CoreApp: React.FC = () => {
       eventType: "reload"
     }
 
-
     sendMessageToBackgroundScript(eventMessage)
-
   }
 
   const copyToClipboardButton = (message:string) => {
@@ -101,10 +118,11 @@ export const CoreApp: React.FC = () => {
   //display app
   return (
     <div className='app'>
+      
       {/* <h2 className='heading unselectable' style={{ fontFamily: 'DINCondensed-Regular' }}>Message Ninja </h2> */}
       <div className="textBoxContainer">
         <div className='textBox' onClick={() => {copyToClipboardButton(message)}}>
-          <p className='unselectable'>{message}</p>
+          {loadingBarVisible? <LoadingBar apiResponded={apiResponded}/> : <p className='unselectable'>{message}</p>}
         </div>
       </div>
       <div className='buttonContainer'>
