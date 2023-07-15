@@ -64,6 +64,12 @@
   border: 0.5px solid #ffe600
 }
 
+.textBox:focus {
+  outline: none !important;
+  color: #ffe600;
+  border: 0.5px solid #ffe600
+}
+
 .buttonContainer {
   width: 100%;
   display: flex;

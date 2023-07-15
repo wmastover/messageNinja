@@ -7,7 +7,7 @@ export const getToken =  (url: string, iframe: HTMLIFrameElement): string => {
   var returnToken = "no token"
 
   
-  if (url.includes("https://messageninja.ai")) {
+  if (url.includes("https://app.messageninja.ai")) {
 
     try {
       const token = iframe.contentDocument?.getElementById("authenticationToken")?.textContent
@@ -23,6 +23,8 @@ export const getToken =  (url: string, iframe: HTMLIFrameElement): string => {
 
     }
     
+  } else {
+    console.log("Not https://app.messageninja.ai")
   }
   return(returnToken)
 }

@@ -11,6 +11,8 @@ interface LoginPageProps {
 export const LoginPage: React.FC<LoginPageProps> = ({ setLoggedIn }) => {
   const getTokenFunction = async () => {
     getActiveTab().then((response) => {
+      console.log("got active tab")
+
       const token = getToken(response.url, response.iframe);
       if (token != "no token") {
 
@@ -34,7 +36,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setLoggedIn }) => {
           console.log("response --");
           console.log(error.message);
         }  
-      } 
+      } else {
+        console.log("no token")
+      }
     });
   }
 
